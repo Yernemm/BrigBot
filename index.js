@@ -10,7 +10,7 @@ const config = require("./config.json");
 const m = require("./shared/methods.js");
 
 const logChannelID = config.logChannelID;
-const botChannelID = "481948031042977805";
+const botChannelID = config.botChannelID;
 
 // This loop reads the /events/ folder and attaches each event file to the appropriate event.
 fs.readdir("./events/", (err, files) => {
@@ -39,10 +39,10 @@ client.on("message", message => {
   }
   if (message.author.bot) return;
   if (message.channel.type != "text") return;
-  if (message.content.indexOf(config.prefix) !== 0) return;
+  //if (message.content.indexOf(config.prefix) !== 0) return;
   if (message.content.startsWith(".")) return;
 
-  if (message.channel.id == "481948031042977805") { //Check if in assistant channel.
+  if (message.channel.id == botChannelID) { //Check if in assistant channel.
     // This is the best way to define args. Trust me.
     const argsArr = message.content.slice(config.prefix.length).trim().split(/ +/g);
     const command = argsArr.shift().toLowerCase().replace(/[^a-zA-Z ]/g, "");
