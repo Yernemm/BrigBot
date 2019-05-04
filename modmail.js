@@ -18,7 +18,7 @@ exports.sendUserToMods = (config, client, message) => {
                 sendTheMsg(client.channels.get(config.mailChannelID), message, embed, userId)
             .then(() => {
                 message.channel.send("**Message has been passed on to the mods!**\r\nPlease wait for a reply before sending more messages.")
-            }).catch();
+            }).catch((error) => message.channel.send("Error sending message. Ensure any attached files are below 8MB."));
             
 
 };
@@ -53,7 +53,7 @@ exports.sendModsToUser = (config, client, message) => {
         sendTheMsg(message.channel, message, embed, `Sent to <@${userId}> :`)
         .then().catch()
     )
-        .catch();
+        .catch((error) => message.channel.send("Error sending message. Ensure any attached files are below 8MB."));
 
     })
     .catch(e =>{

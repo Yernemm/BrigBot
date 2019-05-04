@@ -3,7 +3,7 @@
 exports.cmdtype = () => {
     return "core";
 }
-const desc = "Displays stats for YerBot"; //Short description of what the command does.
+const desc = "Displays stats"; //Short description of what the command does.
 const usage = ""; //Any parameters required for command.
 exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
     const bot = client;
