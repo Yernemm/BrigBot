@@ -12,7 +12,7 @@ exports.sendUserToMods = (config, client, message) => {
             .setColor(0xf44242)
             .setTimestamp()
             .setDescription(message.content)
-            .addField("User info:", `Name: ${message.author.username}#${message.author.discriminator}\nID: ${message.author.id}\nUser: <@${message.author.username}>`);
+            .addField("User info:", `Name: ${message.author.username}#${message.author.discriminator}\nID: ${message.author.id}\nUser: <@${message.author.id}>`);
             let userId = message.author.id;
             
                 sendTheMsg(client.channels.get(config.mailChannelID), message, embed, userId)
