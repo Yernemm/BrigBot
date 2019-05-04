@@ -6,7 +6,7 @@ exports.run = (client) => {
   bot.user.setPresence({ status: 'online', game: { name: `DM me for Mod Mail!` } });
   var d = new Date();
   timeStart = d.getTime();
-  var msg = "<:yHappy:398973907576553472>\r\n__**Heey! I am now online!**__";
+  var msg = ":D\r\n__**Heey! I am now online!**__";
   //msg += `\r\nServers: ${client.guilds.size} Channels: ${client.channels.size} Users: ${client.users.size}`
  
 

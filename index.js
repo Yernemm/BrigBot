@@ -3,6 +3,7 @@ const client = new Discord.Client();
 const readline = require('readline');
 const fs = require("fs");
 const puppeteer = require('puppeteer');
+const modmail = require("./modmail.js");
 var running = true;
 
 
@@ -32,15 +33,18 @@ client.on("guildMemberAdd", (member) => {
 });
 
 client.on("message", message => {
-  if (message.channel.id == config.spFrom) {
-    var d = message.createdAt;
-    var timeS = d.getUTCFullYear() + "/" + m.lZero((d.getUTCMonth() + 1), 2) + "/" + m.lZero(d.getUTCDate(), 2) + " " + m.lZero(d.getUTCHours(), 2) + ":" + m.lZero(d.getUTCMinutes(), 2) + ":" + m.lZero(d.getUTCSeconds(), 2);
-    client.channels.get(spTo).send(timeS + " " + message.author + ": " + message.content);
-  }
   if (message.author.bot) return;
+  if(message.channel.type == "dm"){
+    //Do mod mail sending from user to mods.
+    modmail.sendUserToMods(config, client, message);
+  }
   if (message.channel.type != "text") return;
   //if (message.content.indexOf(config.prefix) !== 0) return;
   if (message.content.startsWith(".")) return;
+  if(message.channel.id == config.mailChannelID){
+    //Do mod mail sending from mods to user.
+    modmail.sendModsToUser(config, client, message);
+  }
 
   if (message.channel.id == botChannelID) { //Check if in assistant channel.
     // This is the best way to define args. Trust me.
@@ -111,7 +115,7 @@ function cleverbotSend(message, callback){
       lgp("Setting viewport...");
       await page.setViewport({width: 1920, height: 1080});
       lgp("Loading CleverBot website...");
-      await page.goto('https://www.cleverbot.com/', {waitUntil: 'networkidle2'});
+      await page.goto('https://www.cleverbot.com/', {waitUntil: 'networkidle2', timeout: 0});
       //await page.setRequestInterception(true);
       lgp("Sending message...");
       var messageToSend = message

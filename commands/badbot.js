@@ -10,7 +10,7 @@ exports.run = (config, client, message, args) => {
     const m = require("./../shared/methods.js");
 
     //--------------------------------------------------------------------
-    var msg = "<:yCry:398973998567784458>"; //Put response message to be logged here.
+    var msg = ":^("; //Put response message to be logged here.
     //--------------------------------------------------------------------
 
     //COMMAND LOGIC HERE:
