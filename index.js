@@ -74,7 +74,7 @@ client.on("message", message => {
           //Command not found
           //Give random fact instead.
             message.channel.startTyping();
-          cleverbotSend(argsArr, res =>{
+          cleverbotSend(message.content, res =>{
             console.log(">Response: " + res);
             message.channel.send(res);
             message.channel.stopTyping();
@@ -105,68 +105,98 @@ client.on("message", message => {
 
 
 
-
 function cleverbotSend(message, callback){
-    (async () => {
-      lgp("Opening browser...");
-      const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
-      lgp("Opening new tab...");
-      const page = await browser.newPage();
-      lgp("Setting viewport...");
-      await page.setViewport({width: 1920, height: 1080});
-      lgp("Loading CleverBot website...");
-      await page.goto('https://www.cleverbot.com/', {waitUntil: 'networkidle2', timeout: 0});
-      //await page.setRequestInterception(true);
-      lgp("Sending message...");
-      var messageToSend = message
-  
-      page.evaluate(function(botmsg){
-        document.querySelector('form[id="avatarform"] > input[name="stimulus"]').value = botmsg;
-        cleverbot.sendAI();
-    }, message);
-  
-  
-      lgp("Intercepting response...");
-      page.on('response', response => {
-        //console.log(interceptedRequest.url());
-        var alreadyFound = false;
-        if(response.url().startsWith("https://www.cleverbot.com/webservicemin?")){
-          //console.log("==================================");
-          if(!alreadyFound)
-          lgp("Response found...");
-  
-          //IT TOOK ME WAYYY TOO LONG TO WORK OUT THESE ARE SEPARATED BY '\r'
-          //I'm keeping the debug code commented instead of deleting, as a reminder of my incompetence.
-  
-         // console.log(response.status());
-          response.text().then(r =>{
+  (async () => {
+   message = message.replace(/([<>])/g, "");
+    //await page.setRequestInterception(true);
+    lgp("Sending message...");
+    var messageToSend = message
 
-            
-  
-  
-            if(r != "OK\n"){
-              alreadyFound = true;
-              callback(r.split("\r")[0]);
-              lgp("Closing browser...");
-      browser.close().then(()=>{lgp("Done!");});
-              }
-          }).catch();
+    page.evaluate(function(botmsg){
+      document.querySelector('form[id="avatarform"] > input[name="stimulus"]').value = botmsg;
+      cleverbot.sendAI();
+  }, message);
+
+
+
+
+
+
+   
+
+    
+    })();
+}
+
+function startCleverbot(){
+  lgp("start");
+  (async () =>{
+    lgp("Opening browser...");
+    browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
+    lgp("Opening new tab...");
+    page = await browser.newPage();
+    lgp("Loading CleverBot website...");
+    await page.goto('https://www.cleverbot.com/', {waitUntil: 'networkidle2', timeout: 0});
+
+    lgp("Intercepting responses...");
+    page.on('response', response => {
+      //console.log(interceptedRequest.url());
+      var alreadyFound = false;
+      if(response.url().startsWith("https://www.cleverbot.com/webservicemin?")){
+        //console.log("==================================");
+        if(!alreadyFound)
+        lgp("Response found...");
+
+        //IT TOOK ME WAYYY TOO LONG TO WORK OUT THESE ARE SEPARATED BY '\r'
+        //I'm keeping the debug code commented instead of deleting, as a reminder of my incompetence.
+
+       // console.log(response.status());
+        response.text().then(r =>{
+
           
-          //console.log("==================================");
-        }
-  
-      });
-  
 
-  
-     
-  
-      
-      })();
-  }
 
-  function lgp(msg){
-    console.log("================" + msg);
-  }
+          if(r != "OK\n"){
+            alreadyFound = true;
+            cleverRespond(r.split("\r")[0], client.channels.get(botChannelID));
+
+            }
+        }).catch();
+        
+        //console.log("==================================");
+      }
+
+    
+    });
+  })();
+
+  setInterval(() => {
+    lgp("Reloading...");
+    page.reload();
+  }, 1000 * 60 * 60)
+}
+
+function endCleverbot(){
+  (async () =>{
+    lgp("Closing browser...");
+    browser.close().then(()=>{lgp("Done!");});
+  })();
+}
+
+function lgp(msg){
+  console.log("================" + msg);
+}
+
+function cleverRespond(res, channel){
+  
+    console.log(">Response: " + res);
+    channel.send(res);
+    channel.stopTyping(true);
+    
+    
+  
+}
+
+client.on("ready", () =>{startCleverbot();})
 
 client.login(config.token);
