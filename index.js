@@ -5,6 +5,10 @@ const fs = require("fs");
 const puppeteer = require('puppeteer');
 const modmail = require("./modmail.js");
 var running = true;
+var browser;
+var page;
+var aiLastRestarted = 0;
+const aiRestartCooldown = 1000 * 60 * 10;
 
 
 const config = require("./config.json");
@@ -47,6 +51,15 @@ client.on("message", message => {
   }
 
   if (message.channel.id == botChannelID) { //Check if in assistant channel.
+
+    //Restart AI command 
+    if(message.content.toLowerCase().startsWith("restartai")){
+      m.log(config, client, message, "Restart Command");
+      restartCleverbotCmd(message.channel);
+      return;
+    }
+
+
     // This is the best way to define args. Trust me.
     const argsArr = message.content.slice(config.prefix.length).trim().split(/ +/g);
     const command = argsArr.shift().toLowerCase().replace(/[^a-zA-Z ]/g, "");
@@ -128,7 +141,7 @@ function cleverbotSend(message, callback){
     })();
 }
 
-function startCleverbot(){
+function startCleverbot(callback = ( ()=>{} )){
   lgp("start");
   (async () =>{
     lgp("Opening browser...");
@@ -139,6 +152,7 @@ function startCleverbot(){
     await page.goto('https://www.cleverbot.com/', {waitUntil: 'networkidle2', timeout: 0});
 
     lgp("Intercepting responses...");
+    callback();
     page.on('response', response => {
       //console.log(interceptedRequest.url());
       var alreadyFound = false;
@@ -168,12 +182,21 @@ function startCleverbot(){
 
     
     });
-  })();
 
+    //Close them pesky dialog boxes.
+    page.on('dialog', async dialog => {
+      console.log(dialog.message());
+      await dialog.dismiss();
+      
+    });
+
+  })();
+  lgp("Setting interval...")
   setInterval(() => {
     lgp("Reloading...");
     page.reload();
   }, 1000 * 60 * 60)
+  
 }
 
 function endCleverbot(){
@@ -197,6 +220,27 @@ function cleverRespond(res, channel){
   
 }
 
-client.on("ready", () =>{startCleverbot();})
+function restartCleverbotCmd(channel){
+  if((Date.now() - aiLastRestarted) >= (aiRestartCooldown)){
+    aiLastRestarted = Date.now();
+  (async () =>{ 
+    
+    await channel.send("Restarting AI...")
+    lgp("Closing browser...");
+    browser.close().then(()=>{
+      lgp("Done!");
+      startCleverbot( () => channel.send("AI started.") );
+      
+    });
 
+
+  })();
+}else{
+  let timeToWait = aiRestartCooldown - (Date.now() - aiLastRestarted);
+  console.log(timeToWait);
+  channel.send(`**Please wait ${Math.floor(timeToWait / (1000 * 60))} minutes and ${Math.floor((timeToWait / 1000) % 60)} seconds before restarting the AI.**`)
+}
+}
+
+client.on("ready", () =>{startCleverbot();})
 client.login(config.token);
