@@ -35,13 +35,13 @@ exports.sendModsToUser = (config, client, message) => {
 
 
     //Isolate the user ID from a user mention.
-    var uregex = /([0-9])+/g;
-    if(!uregex.test(userId)){
-        message.channel.send("The first word has to be either the user ID or the user mention.")
-        return;
-    }
-    else
-    userId = uregex.exec(userId)[0];
+    //var uregex = /([0-9])+/g;
+   // if(!uregex.test(userId)){
+     //   message.channel.send("The first word has to be either the user ID or the user mention.")
+     //   return;
+   // }
+   // else
+   // userId = uregex.exec(userId)[0];
 
 
 
