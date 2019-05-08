@@ -41,7 +41,7 @@ exports.sendModsToUser = (config, client, message) => {
         return;
     }
     else
-    userId = uregex.exec(userId);
+    userId = uregex.exec(userId)[0];
 
 
 
