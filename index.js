@@ -53,12 +53,13 @@ client.on("message", message => {
   if (message.channel.id == botChannelID) { //Check if in assistant channel.
 
     //Restart AI command 
+	/*
     if(message.content.toLowerCase().startsWith("restartai")){
       m.log(config, client, message, "Restart Command");
       restartCleverbotCmd(message.channel);
       return;
     }
-
+*/
 
     // This is the best way to define args. Trust me.
     const argsArr = message.content.slice(config.prefix.length).trim().split(/ +/g);
@@ -86,6 +87,7 @@ client.on("message", message => {
         if (rawErr2.code == 'MODULE_NOT_FOUND' && rawErr1.code == 'MODULE_NOT_FOUND') {
           //Command not found
           //Give random fact instead.
+		  /*
             message.channel.startTyping();
           cleverbotSend(message.content, res =>{
             console.log(">Response: " + res);
@@ -94,7 +96,7 @@ client.on("message", message => {
             
             
           })
-
+*/
           //
 
 
@@ -242,5 +244,5 @@ function restartCleverbotCmd(channel){
 }
 }
 
-client.on("ready", () =>{startCleverbot();})
+client.on("ready", () =>{/*startCleverbot();*/})
 client.login(config.token);
